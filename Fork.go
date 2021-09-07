@@ -36,8 +36,10 @@ func Forkfunc(fork Fork) {
 
 		case 2:
 			if fork.inUse {
+				//Fork is taken
 				fork.output <- -1
 			} else {
+				//Fork is free
 				fork.output <- -2
 			}
 		case 3:
@@ -51,9 +53,13 @@ func switchstate(fork Fork) {
 
 	if fork.inUse {
 		fork.inUse = false
+		//Fork is free
+		fork.output <- -2
 	} else {
 		fork.inUse = true
 		fork.timesUsed++
+		//Fork is taken
+		fork.output <- -1
 	}
 
 }
