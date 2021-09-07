@@ -7,17 +7,28 @@ package The_dining_philosophers
   times eaten, eating or thinking)
 */
 
-var inputPhilosopher = make(chan int)
-var outputPhilosopher = make(chan int)
-
 type Philosopher struct {
-	name     int
-	hasFork  bool
-	isEating bool
+	name      int
+	hasFork   bool
+	isEating  bool
+	input     chan int
+	output    chan int
+	leftFork  *Fork
+	rightFork *Fork
+
+	Eat func(t bool)
 }
 
-func NewPhilosopher(philosopherNumber int) *Philosopher {
-	philosopher := new(Philosopher)
-	philosopher.name = philosopherNumber
-	return philosopher
+func NewPhilosopher(philosopherNumber int, lf, rf *Fork) *Philosopher {
+	p := new(Philosopher)
+	p.name = philosopherNumber
+	p.hasFork = false
+	p.isEating = false
+	p.input = make(chan int)
+	p.output = make(chan int)
+	p.leftFork = lf
+	p.rightFork = rf
+	return p
 }
+
+func Eat()
