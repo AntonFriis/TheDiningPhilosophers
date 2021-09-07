@@ -20,3 +20,19 @@ func NewFork(forkNumber int) *Fork {
 	fork.name = forkNumber
 	return fork
 }
+
+func forkfunc(input chan int, output chan int) {
+	var comand int
+	for {
+		comand = <-input
+
+		switch comand {
+		case 1:
+
+		case 2:
+
+		case 3:
+		}
+	}
+
+}
