@@ -8,27 +8,29 @@ package The_dining_philosophers
 */
 
 type Philosopher struct {
-	name      int
-	hasFork   bool
-	isEating  bool
-	input     chan int
-	output    chan int
-	leftFork  *Fork
-	rightFork *Fork
-
-	Eat func(t bool)
+	name       int
+	hasFork    bool
+	isEating   bool
+	timesEaten int
+	input      chan int
+	output     chan int
+	leftFork   *Fork
+	rightFork  *Fork
 }
 
-func NewPhilosopher(philosopherNumber int, lf, rf *Fork) *Philosopher {
-	p := new(Philosopher)
-	p.name = philosopherNumber
-	p.hasFork = false
-	p.isEating = false
-	p.input = make(chan int)
-	p.output = make(chan int)
-	p.leftFork = lf
-	p.rightFork = rf
-	return p
+func NewPhilosopher(philosopherNumber int, intputChannel, outputChannel chan int, lf, rf *Fork) *Philosopher {
+	philosopher := new(Philosopher)
+	philosopher.name = philosopherNumber
+	philosopher.hasFork = false
+	philosopher.isEating = false
+	philosopher.timesEaten = 0
+	philosopher.input = intputChannel
+	philosopher.output = outputChannel
+	philosopher.leftFork = lf
+	philosopher.rightFork = rf
+	return philosopher
 }
 
-func Eat()
+func Eat(p *Philosopher) {
+
+}
