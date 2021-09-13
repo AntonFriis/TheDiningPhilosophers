@@ -77,6 +77,5 @@ func forkAssert(fork *Fork, command int) {
 	}
 	if command == forkSetFree && fork.state == forkIsFree {
 		fmt.Printf("Error: Fork %d is already free", fork.name)
-
 	}
 }
