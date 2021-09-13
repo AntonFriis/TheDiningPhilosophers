@@ -1,13 +1,27 @@
 package The_dining_philosophers
 
-func WaiterStartup(philIn, philOut, forkIn, forkOut [5]chan int, runtimes int) {
-	var philoInQue = -1
+var philIn, philOut, forkIn, forkOut []chan int
+var philoInQue int
+
+func WaiterStartup(runtimes int) {
 
 	var i = 0
 	for i < runtimes {
-		if philoInQue != -1 {
-
+		if philoInQue == -1 {
+			var other int
+			if philoInQue == 0 {
+				other = 4
+			} else {
+				other = philoInQue - 1
+			}
+			if askFork(philoInQue) && askFork(other) {
+				lockFork(philoInQue)
+				lockFork(other)
+				philIn[philoInQue] <- philosopherSetEating
+				philoInQue = -1
+			}
 		}
+
 		select {
 		case x := <-philOut[0]:
 			x++
@@ -26,10 +40,20 @@ func WaiterStartup(philIn, philOut, forkIn, forkOut [5]chan int, runtimes int) {
 
 }
 func unlockForks(chanl1, chanl2 int) {
+	forkIn[chanl1] <- forkSetFree
+	forkIn[chanl2] <- forkSetFree
+}
+func askFork(chanl int) bool {
+	forkIn[chanl] <- forkAskInUse
+	answer := <-forkOut[chanl]
+	if answer == -1 {
+		return true
+	} else {
+		return false
+	}
 
 }
-
-func fockForks(chanl int) {
+func lockFork(chanl int) {
 
 }
 
@@ -41,5 +65,19 @@ func changeEater(curret int) {
 		other = curret - 1
 	}
 	unlockForks(curret, other)
+	other = curret
+	if curret == 4 {
+		curret = 0
+	} else {
+		curret++
+	}
+	if askFork(curret) && askFork(other) {
+		lockFork(curret)
+		lockFork(other)
+		philIn[curret] <- philosopherSetEating
+
+	} else {
+		philoInQue = curret
+	}
 
 }
