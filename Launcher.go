@@ -36,4 +36,9 @@ func main() {
 	}
 
 	//INSTANTIATE WAITER AND START WAITER HERE!
+	philIn = philosopherInputChannels
+	philOut = philosopherOutputChannels
+	forkIn = forkInputChannels
+	forkOut = forkInputChannels
+	WaiterStartup(5000000)
 }
