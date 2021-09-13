@@ -1,5 +1,7 @@
 package The_dining_philosophers
 
+import "fmt"
+
 /*
 - each fork must include two channels (one for input and one for
   output, both usable from outside) through which it is possible to
@@ -7,6 +9,17 @@ package The_dining_philosophers
   or free)
 */
 
+//Fork states
+var forkIsFree = -1
+var forkInUse = -2
+
+//Fork input commands
+var forkAskInUse = 1
+var forkAskTimesEaten = 2
+var forkSetUse = 3
+var forkSetFree = 4
+
+//Fork values (java: fields)
 type Fork struct {
 	name      int
 	inUse     bool
@@ -15,6 +28,7 @@ type Fork struct {
 	output    chan int
 }
 
+//Fork constructer
 func NewFork(forkNumber int, intputChannel, outputChannel chan int) *Fork {
 	fork := new(Fork)
 	fork.name = forkNumber
@@ -25,42 +39,48 @@ func NewFork(forkNumber int, intputChannel, outputChannel chan int) *Fork {
 	return fork
 }
 
-func Forkfunc(fork Fork) {
-	var comand int
-
+//Fork gorouting function
+//Loops forever, performs commands given via input channel (see above)
+//Anwers via output channel if given question
+func ForkStart(fork *Fork) {
 	for {
-		comand = <-fork.input
+		//int given from input channel
+		command := <-fork.input
 
-		switch comand {
-		case 1:
-			fork.output <- fork.timesUsed
-
-		case 2:
+		//cases of the command is descriped at the top
+		switch command {
+		case forkAskInUse:
+			//will answer with the state (see top) of the fork
 			if fork.inUse {
-				//Fork is taken
-				fork.output <- -1
+				fork.output <- forkInUse
 			} else {
-				//Fork is free
-				fork.output <- -2
+				fork.output <- forkIsFree
 			}
-		case 3:
-			switchstate(fork)
+		case forkAskTimesEaten:
+			//Answers with the number of times the fork has been used
+			fork.output <- fork.timesUsed
+		case forkSetUse:
+			//Set the forks state to in use
+			forkAssert(fork, command) //checks that the fork isnt already in use
+			fork.inUse = true
+			fork.timesUsed++
+		case forkSetFree:
+			//Set the forks state to not in use and incroments the times it has been used
+			forkAssert(fork, command) //checks that the fork isnt already not in use
+			fork.inUse = false
 		}
 	}
-
 }
 
-func switchstate(fork Fork) {
-
-	if fork.inUse {
-		fork.inUse = false
-		//Fork is free
-		fork.output <- -2
-	} else {
-		fork.inUse = true
-		fork.timesUsed++
-		//Fork is taken
-		fork.output <- -1
+//Checks that forks wont change its state (inUse) to something that it is already doing
+//Prints in Terminal if an error is detected
+//Application will still continue
+func forkAssert(fork *Fork, command int) {
+	if command == forkSetUse && fork.inUse {
+		fmt.Printf("Error: Fork %d is already in use", fork.name)
 	}
+	if command == forkSetFree && !fork.inUse {
+		fmt.Printf("Error: Fork %d is already free", fork.name)
 
+	}
 }
