@@ -23,7 +23,7 @@ var philosopherSetThinking = 4
 type Philosopher struct {
 	name       int
 	hasFork    bool
-	isEating   bool
+	state      int //Is either eating or thinking (see top)
 	timesEaten int
 	input      chan int
 	output     chan int
@@ -36,7 +36,7 @@ func NewPhilosopher(philosopherNumber int, intputChannel, outputChannel chan int
 	philosopher := new(Philosopher)
 	philosopher.name = philosopherNumber
 	philosopher.hasFork = false
-	philosopher.isEating = false
+	philosopher.state = philosopherIsThinking
 	philosopher.timesEaten = 0
 	philosopher.input = intputChannel
 	philosopher.output = outputChannel
@@ -46,7 +46,7 @@ func NewPhilosopher(philosopherNumber int, intputChannel, outputChannel chan int
 }
 
 //Philosopher gorouting function
-//Loops forever, performs commands given via input channel (see above)
+//Loops forever, performs commands given via input channel (see top)
 //Anwers via output channel if given question
 func PhilosopherStart(philosopher *Philosopher) {
 	for {
@@ -56,24 +56,20 @@ func PhilosopherStart(philosopher *Philosopher) {
 		//cases of the command is descriped at the top
 		switch command {
 		case philosopherAskIsEating:
-			//will answer with the state (see top) of the philosopher
-			if philosopher.isEating {
-				philosopher.output <- philosopherIsEating
-			} else {
-				philosopher.output <- philosopherIsThinking
-			}
+			//will answer with either is eating or is thinking (see top)
+			philosopher.output <- philosopher.state
 		case philosopherAskTimesEaten:
 			//Answers with the number of times the philosopher has eaten
 			philosopher.output <- philosopher.timesEaten
 		case philosopherSetEating:
 			//Set the philosophers state to eating
 			philosopherAssert(philosopher, command) //checks that the philosopher isnt already eating
-			philosopher.isEating = true
+			philosopher.state = philosopherIsEating
 			philosopher.timesEaten++
 		case philosopherSetThinking:
 			//Set the philosophers state to thinking and incroments the times he has eaten
 			philosopherAssert(philosopher, command) //checks that the philosopher isnt already thinking
-			philosopher.isEating = false
+			philosopher.state = philosopherIsThinking
 		}
 	}
 }
@@ -82,10 +78,10 @@ func PhilosopherStart(philosopher *Philosopher) {
 //Prints in Terminal if an error is detected
 //Application will still continue
 func philosopherAssert(philosopher *Philosopher, command int) {
-	if command == philosopherSetEating && philosopher.isEating {
+	if command == philosopherSetEating && philosopher.state == philosopherIsEating {
 		fmt.Printf("Error: Philosopher %d is already in use", philosopher.name)
 	}
-	if command == philosopherSetThinking && !philosopher.isEating {
+	if command == philosopherSetThinking && philosopher.state == philosopherIsThinking {
 		fmt.Printf("Error: Philosopher %d is already free", philosopher.name)
 
 	}

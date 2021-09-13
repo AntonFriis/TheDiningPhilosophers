@@ -22,7 +22,7 @@ var forkSetFree = 4
 //Fork values (java: fields)
 type Fork struct {
 	name      int
-	inUse     bool
+	state     int //Is either in use or free (see top)
 	timesUsed int
 	input     chan int
 	output    chan int
@@ -32,7 +32,7 @@ type Fork struct {
 func NewFork(forkNumber int, intputChannel, outputChannel chan int) *Fork {
 	fork := new(Fork)
 	fork.name = forkNumber
-	fork.inUse = false
+	fork.state = forkIsFree
 	fork.timesUsed = 0
 	fork.input = intputChannel
 	fork.output = outputChannel
@@ -40,7 +40,7 @@ func NewFork(forkNumber int, intputChannel, outputChannel chan int) *Fork {
 }
 
 //Fork gorouting function
-//Loops forever, performs commands given via input channel (see above)
+//Loops forever, performs commands given via input channel (see top)
 //Anwers via output channel if given question
 func ForkStart(fork *Fork) {
 	for {
@@ -50,24 +50,20 @@ func ForkStart(fork *Fork) {
 		//cases of the command is descriped at the top
 		switch command {
 		case forkAskInUse:
-			//will answer with the state (see top) of the fork
-			if fork.inUse {
-				fork.output <- forkInUse
-			} else {
-				fork.output <- forkIsFree
-			}
+			//will answer with either is in use or is free (see top)
+			fork.output <- fork.state
 		case forkAskTimesEaten:
 			//Answers with the number of times the fork has been used
 			fork.output <- fork.timesUsed
 		case forkSetUse:
 			//Set the forks state to in use
 			forkAssert(fork, command) //checks that the fork isnt already in use
-			fork.inUse = true
+			fork.state = forkInUse
 			fork.timesUsed++
 		case forkSetFree:
 			//Set the forks state to not in use and incroments the times it has been used
 			forkAssert(fork, command) //checks that the fork isnt already not in use
-			fork.inUse = false
+			fork.state = forkIsFree
 		}
 	}
 }
@@ -76,10 +72,10 @@ func ForkStart(fork *Fork) {
 //Prints in Terminal if an error is detected
 //Application will still continue
 func forkAssert(fork *Fork, command int) {
-	if command == forkSetUse && fork.inUse {
+	if command == forkSetUse && fork.state == forkInUse {
 		fmt.Printf("Error: Fork %d is already in use", fork.name)
 	}
-	if command == forkSetFree && !fork.inUse {
+	if command == forkSetFree && fork.state == forkIsFree {
 		fmt.Printf("Error: Fork %d is already free", fork.name)
 
 	}
