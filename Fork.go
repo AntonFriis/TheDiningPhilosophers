@@ -9,18 +9,19 @@ package The_dining_philosophers
 
 type Fork struct {
 	name      int
+	inUse     bool
 	timesUsed int
 	input     chan int
 	output    chan int
-	inUse     bool
-	f         func()
 }
 
-func NewFork() *Fork {
-	var fork *Fork = new(Fork)
-
-	fork.input = make(chan int)
-	fork.output = make(chan int)
+func NewFork(forkNumber int, intputChannel, outputChannel chan int) *Fork {
+	fork := new(Fork)
+	fork.name = forkNumber
+	fork.inUse = false
+	fork.timesUsed = 0
+	fork.input = intputChannel
+	fork.output = outputChannel
 	return fork
 }
 
