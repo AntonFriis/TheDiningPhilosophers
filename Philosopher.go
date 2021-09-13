@@ -1,6 +1,9 @@
 package The_dining_philosophers
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 /*
   each philosopher must include two channels (one for input and one
@@ -66,6 +69,7 @@ func PhilosopherStart(philosopher *Philosopher) {
 			philosopherAssert(philosopher, command) //checks that the philosopher isnt already eating
 			philosopher.state = philosopherIsEating
 			philosopher.timesEaten++
+			time.Sleep(time.Second)
 		case philosopherSetThinking:
 			//Set the philosophers state to thinking and incroments the times he has eaten
 			philosopherAssert(philosopher, command) //checks that the philosopher isnt already thinking
@@ -83,6 +87,5 @@ func philosopherAssert(philosopher *Philosopher, command int) {
 	}
 	if command == philosopherSetThinking && philosopher.state == philosopherIsThinking {
 		fmt.Printf("Error: Philosopher %d is already free", philosopher.name)
-
 	}
 }
