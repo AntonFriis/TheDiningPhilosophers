@@ -25,8 +25,8 @@ type Fork struct {
 	outputLeft  chan int
 }
 
-func NewFork(intputChannelRight, outputChannelRight, intputChannelLeft, outputChannelLeft chan int) Fork {
-	var fork = Fork{true, 0, intputChannelRight, outputChannelRight, intputChannelLeft, outputChannelLeft}
+func NewFork(outputChannelRight, intputChannelRight, outputChannelLeft, intputChannelLeft chan int) Fork {
+	var fork = Fork{true, 0, outputChannelRight, intputChannelRight, outputChannelLeft, intputChannelLeft}
 	return fork
 
 }
