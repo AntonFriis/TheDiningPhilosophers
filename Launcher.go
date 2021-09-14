@@ -4,11 +4,13 @@ func main() {
 	//Instantiate 5 Forks and their channels
 	var forkInputChannels = make([]chan int, 5)
 	var forkOutputChannels = make([]chan int, 5)
-	var forks = make([]*Fork, 5)
+	//var forks = make([]Fork, 5)
+	var forks []Fork
 	for f := 0; f < 5; f++ {
 		forkInputChannels[f] = make(chan int)
 		forkOutputChannels[f] = make(chan int)
-		forks[f] = NewFork(f, forkInputChannels[f], forkOutputChannels[f])
+		//forks[f] = NewFork(f, forkInputChannels[f], forkOutputChannels[f])
+		forks = append(forks, NewFork(f, forkInputChannels[f], forkOutputChannels[f]))
 	}
 
 	//Instantiate 5 Philosophers and their channels
@@ -23,7 +25,7 @@ func main() {
 		if lf < 0 {      //The first philosophers left fork is the last index of the fork array
 			lf = len(forks) - 1
 		}
-		philosophers[p] = *NewPhilosopher(p, philosopherInputChannels[p], philosopherOutputChannels[p], forks[lf], forks[rf])
+		philosophers[p] = NewPhilosopher(p, philosopherInputChannels[p], philosopherOutputChannels[p], forks[lf], forks[rf])
 	}
 
 	//Starts goroutines for all forks

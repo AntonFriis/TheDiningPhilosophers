@@ -29,20 +29,23 @@ type Fork struct {
 }
 
 //Fork constructer
-func NewFork(forkNumber int, intputChannel, outputChannel chan int) *Fork {
-	fork := new(Fork)
+func NewFork(forkNumber int, intputChannel, outputChannel chan int) Fork {
+	var fork = Fork{forkNumber, forkIsFree, 0, intputChannel, outputChannel}
+	return fork
+
+	/*fork := new(Fork)
 	fork.name = forkNumber
 	fork.state = forkIsFree
 	fork.timesUsed = 0
 	fork.input = intputChannel
 	fork.output = outputChannel
-	return fork
+	return fork*/
 }
 
 //Fork gorouting function
 //Loops forever, performs commands given via input channel (see top)
 //Anwers via output channel if given question
-func ForkStart(fork *Fork) {
+func ForkStart(fork Fork) {
 	for {
 		//int given from input channel
 		command := <-fork.input
@@ -71,7 +74,7 @@ func ForkStart(fork *Fork) {
 //Checks that forks wont change its state (inUse) to something that it is already doing
 //Prints in Terminal if an error is detected
 //Application will still continue
-func forkAssert(fork *Fork, command int) {
+func forkAssert(fork Fork, command int) {
 	if command == forkSetUse && fork.state == forkInUse {
 		fmt.Printf("Error: Fork %d is already in use", fork.name)
 	}
