@@ -26,26 +26,26 @@ func WaiterStartup(runtimes int) {
 		}
 
 		select {
-		case x := <-philOut[0]:
+		case <-philOut[0]:
 			fmt.Println("Philosopher 0 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(0)
-		case x := <-philOut[1]:
+			//fmt.Printf("He has eaten %d", 4)
+			go changeEater(0)
+		case <-philOut[1]:
 			fmt.Println("Philosopher 1 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(1)
-		case x := <-philOut[2]:
+			//fmt.Printf("He has eaten %d", 5)
+			go changeEater(1)
+		case <-philOut[2]:
 			fmt.Println("Philosopher 2 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(2)
-		case x := <-philOut[3]:
+			//fmt.Printf("He has eaten %d", x)
+			go changeEater(2)
+		case <-philOut[3]:
 			fmt.Println("Philosopher 3 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(3)
-		case x := <-philOut[4]:
+			//fmt.Printf("He has eaten %d", x)
+			go changeEater(3)
+		case <-philOut[4]:
 			fmt.Println("Philosopher 4 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(4)
+			//fmt.Printf("He has eaten %d", x)
+			go changeEater(4)
 		}
 
 		i++

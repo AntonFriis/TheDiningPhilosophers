@@ -42,5 +42,5 @@ func main() {
 	philOut = philosopherOutputChannels
 	forkIn = forkInputChannels
 	forkOut = forkInputChannels
-	WaiterStartup(5000000)
+	WaiterStartup(10000)
 }
