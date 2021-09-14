@@ -29,7 +29,7 @@ type Fork struct {
 }
 
 //Fork constructer
-func NewFork(forkNumber int, intputChannel, outputChannel chan int) Fork {
+func NewFork(forkNumber int, intputChannelRight, outputChannelRight, intputChannelLeft, outputChannelLeft chan int) Fork {
 	var fork = Fork{forkNumber, forkIsFree, 0, intputChannel, outputChannel}
 	return fork
 
