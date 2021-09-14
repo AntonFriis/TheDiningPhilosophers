@@ -14,13 +14,11 @@ var forkInUse = -2
 //Fork input commands
 var forkAskInUse = 1
 var forkAskTimesEaten = 2
-var forkSetUse = 3
 var forkSetFree = 4
 
-//Fork values (java: fields)
 type Fork struct {
-	name        int
-	state       int //Is either in use or free (see top)
+
+	state       bool
 	timesUsed   int
 	inputRight  chan int
 	outputRight chan int
@@ -28,18 +26,44 @@ type Fork struct {
 	outputLeft  chan int
 }
 
-//Fork constructer
-func NewFork(forkNumber int, intputChannelRight, outputChannelRight, intputChannelLeft, outputChannelLeft chan int) Fork {
-	var fork = Fork{forkNumber, forkIsFree, 0, intputChannelRight, outputChannelRight, intputChannelLeft, outputChannelLeft}
+
+func NewFork(intputChannelRight, outputChannelRight, intputChannelLeft, outputChannelLeft chan int) Fork {
+	var fork = Fork{true, 0, intputChannelRight, outputChannelRight, intputChannelLeft, outputChannelLeft}
 	return fork
 
 }
 
-//Fork gorouting function
-//Loops forever, performs commands given via input channel (see top)
-//Anwers via output channel if given question
 func ForkStart(fork Fork) {
 	for {
+
+		select {
+		case x := <-fork.inputRight:
+			if x == forkAskInUse {
+
+				if fork.state {
+					fork.state = false
+					fork.outputRight <- forkIsFree
+				} else {
+					fork.outputRight <- forkInUse
+				}
+			} else {
+				fork.state = true
+			}
+
+		case x := <-fork.inputLeft:
+			if x == forkAskInUse {
+
+				if fork.state {
+					fork.state = false
+					fork.outputLeft <- forkIsFree
+				} else {
+					fork.outputLeft <- forkInUse
+				}
+			} else {
+				fork.state = true
+			}
+
+		}
 
 	}
 }
