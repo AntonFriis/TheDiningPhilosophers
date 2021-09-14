@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 /*
 - each fork must include two channels (one for input and one for
   output, both usable from outside) through which it is possible to
@@ -17,7 +19,6 @@ var forkAskTimesEaten = 2
 var forkSetFree = 4
 
 type Fork struct {
-
 	state       bool
 	timesUsed   int
 	inputRight  chan int
@@ -26,19 +27,20 @@ type Fork struct {
 	outputLeft  chan int
 }
 
-
 func NewFork(outputChannelRight, intputChannelRight, outputChannelLeft, intputChannelLeft chan int) Fork {
 	var fork = Fork{true, 0, outputChannelRight, intputChannelRight, outputChannelLeft, intputChannelLeft}
-  
+	fmt.Println("FORK IS MADE")
 	return fork
 
 }
 
 func ForkStart(fork Fork) {
+	fmt.Println("hej")
 	for {
 
 		select {
 		case x := <-fork.inputRight:
+			fmt.Println("jeg er Right")
 			if x == forkAskInUse {
 
 				if fork.state {
@@ -52,6 +54,7 @@ func ForkStart(fork Fork) {
 			}
 
 		case x := <-fork.inputLeft:
+			fmt.Println("jeg er Left")
 			if x == forkAskInUse {
 
 				if fork.state {

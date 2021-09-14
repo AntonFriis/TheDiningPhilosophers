@@ -14,6 +14,7 @@ type Philosopher struct {
 
 func NewPhil(leftIN, leftOUT, rightIN, rightOUT chan int) Philosopher {
 	var phil = Philosopher{leftIN, leftOUT, rightIN, rightOUT}
+	fmt.Println("PHIL IS MADE")
 	return phil
 }
 
@@ -40,32 +41,34 @@ func checkRight(rightIN, rightOUT chan int) int {
 }
 
 func action(phil Philosopher) {
+	for {
 
-	if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree && checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
-		fmt.Println("Philosopher is eating")
-		d := 0.50
-		s := time.Duration(float64(time.Hour.Seconds()*1) * d)
-		time.Sleep(s)
+		if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree && checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
+			fmt.Println("Philosopher is eating")
+			d := 0.50
+			s := time.Duration(float64(time.Hour.Seconds()*1) * d)
+			time.Sleep(s)
 
-		phil.leftOUT <- forkSetFree
-		phil.rightOUT <- forkSetFree
-	} else if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree && checkRight(phil.rightIN, phil.rightOUT) == forkInUse {
-		phil.leftOUT <- forkIsFree
-		fmt.Printf("Philosopher is thinking - right in use")
-		d := 0.33
-		s := time.Duration(float64(time.Hour.Seconds()*1) * d)
-		time.Sleep(s)
-	} else if checkLeft(phil.leftIN, phil.leftOUT) == forkInUse && checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
-		phil.rightOUT <- forkSetFree
-		fmt.Printf("Philosopher is thinking - left in use")
-		d := 0.33
-		s := time.Duration(float64(time.Hour.Seconds()*1) * d)
-		time.Sleep(s)
-	} else {
-		fmt.Printf("Philosopher is thinking both in use")
-		d := 0.33
-		s := time.Duration(float64(time.Hour.Seconds()*1) * d)
-		time.Sleep(s)
+			phil.leftOUT <- forkSetFree
+			phil.rightOUT <- forkSetFree
+		} else if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree && checkRight(phil.rightIN, phil.rightOUT) == forkInUse {
+			phil.leftOUT <- forkIsFree
+			fmt.Println("Philosopher is thinking - right in use")
+			d := 0.33
+			s := time.Duration(float64(time.Hour.Seconds()*1) * d)
+			time.Sleep(s)
+		} else if checkLeft(phil.leftIN, phil.leftOUT) == forkInUse && checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
+			phil.rightOUT <- forkSetFree
+			fmt.Println("Philosopher is thinking - left in use")
+			d := 0.33
+			s := time.Duration(float64(time.Hour.Seconds()*1) * d)
+			time.Sleep(s)
+		} else {
+			fmt.Println("Philosopher is thinking both in use")
+			d := 0.33
+			s := time.Duration(float64(time.Hour.Seconds()*1) * d)
+			time.Sleep(s)
+		}
 	}
 
 }
