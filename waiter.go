@@ -1,10 +1,13 @@
 package main
 
+import "fmt"
+
 var philIn, philOut, forkIn, forkOut []chan int
 var philoInQue int = -1
 
 func WaiterStartup(runtimes int) {
-
+	//sets philosopher 0 and 3 to eat
+	beginEating()
 	var i = 0
 	for i < runtimes {
 		if philoInQue != -1 {
@@ -24,31 +27,39 @@ func WaiterStartup(runtimes int) {
 
 		select {
 		case x := <-philOut[0]:
-			x++
+			fmt.Println("Philosopher 0 is thinking")
+			fmt.Printf("He has eaten %d", x)
+			changeEater(0)
 		case x := <-philOut[1]:
-			x++
+			fmt.Println("Philosopher 1 is thinking")
+			fmt.Printf("He has eaten %d", x)
+			changeEater(1)
 		case x := <-philOut[2]:
-			x++
+			fmt.Println("Philosopher 2 is thinking")
+			fmt.Printf("He has eaten %d", x)
+			changeEater(2)
 		case x := <-philOut[3]:
-			x++
+			fmt.Println("Philosopher 3 is thinking")
+			fmt.Printf("He has eaten %d", x)
+			changeEater(3)
 		case x := <-philOut[4]:
-			x++
+			fmt.Println("Philosopher 4 is thinking")
+			fmt.Printf("He has eaten %d", x)
+			changeEater(4)
 		}
 
 		i++
 	}
 
 }
-func unlockForks(chanl1, chanl2 int) {
-	forkIn[chanl1] <- forkSetFree
-	forkIn[chanl2] <- forkSetFree
-}
-func askFork(chanl int) bool {
-	forkIn[chanl] <- forkAskInUse
-	answer := <-forkOut[chanl]
-	return answer == -1
-}
-func lockFork(chanl int) {
+func beginEating() {
+	lockFork(0)
+	lockFork(4)
+	philIn[0] <- philosopherSetEating
+
+	lockFork(3)
+	lockFork(2)
+	philIn[3] <- philosopherSetEating
 
 }
 
@@ -75,4 +86,17 @@ func changeEater(curret int) {
 		philoInQue = curret
 	}
 
+}
+
+func unlockForks(chanl1, chanl2 int) {
+	forkIn[chanl1] <- forkSetFree
+	forkIn[chanl2] <- forkSetFree
+}
+func askFork(chanl int) bool {
+	forkIn[chanl] <- forkAskInUse
+	answer := <-forkOut[chanl]
+	return answer == -1
+}
+func lockFork(chanl int) {
+	forkIn[chanl] <- forkSetUse
 }
