@@ -4,13 +4,11 @@ func main() {
 	//Instantiate 5 Forks and their channels
 	var forkInputChannels = make([]chan int, 5)
 	var forkOutputChannels = make([]chan int, 5)
-	//var forks = make([]Fork, 5)
-	var forks []Fork
+	var forks = make([]Fork, 5)
 	for f := 0; f < 5; f++ {
 		forkInputChannels[f] = make(chan int)
 		forkOutputChannels[f] = make(chan int)
-		//forks[f] = NewFork(f, forkInputChannels[f], forkOutputChannels[f])
-		forks = append(forks, NewFork(f, forkInputChannels[f], forkOutputChannels[f]))
+		forks[f] = NewFork(f, forkInputChannels[f], forkOutputChannels[f])
 	}
 
 	//Instantiate 5 Philosophers and their channels
@@ -38,9 +36,12 @@ func main() {
 	}
 
 	//INSTANTIATE WAITER AND START WAITER HERE!
-	philIn = philosopherInputChannels
+	InitWaiter(forkInputChannels, forkOutputChannels, philosopherInputChannels, philosopherOutputChannels)
+	StartWaiter()
+	
+	/*philIn = philosopherInputChannels
 	philOut = philosopherOutputChannels
 	forkIn = forkInputChannels
 	forkOut = forkInputChannels
-	WaiterStartup(5000000)
+	WaiterStartup(5000000)*/
 }
