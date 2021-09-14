@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 /*
 - each fork must include two channels (one for input and one for
   output, both usable from outside) through which it is possible to
@@ -21,25 +19,20 @@ var forkSetFree = 4
 
 //Fork values (java: fields)
 type Fork struct {
-	name      int
-	state     int //Is either in use or free (see top)
-	timesUsed int
-	input     chan int
-	output    chan int
+	name        int
+	state       int //Is either in use or free (see top)
+	timesUsed   int
+	inputRight  chan int
+	outputRight chan int
+	inputLeft   chan int
+	outputLeft  chan int
 }
 
 //Fork constructer
 func NewFork(forkNumber int, intputChannelRight, outputChannelRight, intputChannelLeft, outputChannelLeft chan int) Fork {
-	var fork = Fork{forkNumber, forkIsFree, 0, intputChannel, outputChannel}
+	var fork = Fork{forkNumber, forkIsFree, 0, intputChannelRight, outputChannelRight, intputChannelLeft, outputChannelLeft}
 	return fork
 
-	/*fork := new(Fork)
-	fork.name = forkNumber
-	fork.state = forkIsFree
-	fork.timesUsed = 0
-	fork.input = intputChannel
-	fork.output = outputChannel
-	return fork*/
 }
 
 //Fork gorouting function
@@ -47,38 +40,6 @@ func NewFork(forkNumber int, intputChannelRight, outputChannelRight, intputChann
 //Anwers via output channel if given question
 func ForkStart(fork Fork) {
 	for {
-		//int given from input channel
-		command := <-fork.input
 
-		//cases of the command is descriped at the top
-		switch command {
-		case forkAskInUse:
-			//will answer with either is in use or is free (see top)
-			fork.output <- fork.state
-		case forkAskTimesEaten:
-			//Answers with the number of times the fork has been used
-			fork.output <- fork.timesUsed
-		case forkSetUse:
-			//Set the forks state to in use
-			forkAssert(fork, command) //checks that the fork isnt already in use
-			fork.state = forkInUse
-			fork.timesUsed++
-		case forkSetFree:
-			//Set the forks state to not in use and incroments the times it has been used
-			forkAssert(fork, command) //checks that the fork isnt already not in use
-			fork.state = forkIsFree
-		}
-	}
-}
-
-//Checks that forks wont change its state (inUse) to something that it is already doing
-//Prints in Terminal if an error is detected
-//Application will still continue
-func forkAssert(fork Fork, command int) {
-	if command == forkSetUse && fork.state == forkInUse {
-		fmt.Printf("Error: Fork %d is already in use", fork.name)
-	}
-	if command == forkSetFree && fork.state == forkIsFree {
-		fmt.Printf("Error: Fork %d is already free", fork.name)
 	}
 }
