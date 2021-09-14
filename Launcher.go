@@ -32,7 +32,7 @@ func main() {
 	}
 	//Starts goroutines for all philosophers
 	for p := 0; p < 5; p++ {
-		go ForkStart(forks[p])
+		go PhilosopherStart(philosophers[p])
 	}
 
 	//INSTANTIATE WAITER AND START WAITER HERE!

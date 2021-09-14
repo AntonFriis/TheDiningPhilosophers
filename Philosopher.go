@@ -95,7 +95,9 @@ func PhilosopherStart(philosopher Philosopher) {
 }
 
 func recuestEating(philosopher Philosopher) {
+	fmt.Println("phil recuesting eat")
 	philosopher.output <- philosopherRecuestEating
+	fmt.Println("phil eat recuested")
 }
 
 //Checks that philosopher wont change its state (isEating) to something that it is already doing

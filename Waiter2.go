@@ -66,10 +66,12 @@ func checkForks(philosopher int) bool {
 	}
 
 	fmt.Printf("Fork %d will now be asked", fork1)
-	fork1Status := <-frin[fork1]
+	frin[fork1] <- forkAskInUse
+	fork1Status := <- frou[fork1]
 	fmt.Printf("Fork %d is ready", fork1)
 	fmt.Printf("Fork %d will now be asked", fork2)
-	fork2Status := <-frin[fork2]
+	frin[fork2] <- forkAskInUse
+	fork2Status := <- frou[fork2]
 	fmt.Printf("Fork %d is ready", fork2)
 
 	if fork1Status == forkIsFree && fork2Status == forkIsFree {
@@ -82,5 +84,6 @@ func checkForks(philosopher int) bool {
 func setEat(philosopher int) {
 	fmt.Printf("Phil %d will now eat", philosopher)
 	phin[philosopher] <- philosopherSetEating
-	fmt.Printf("Phil %d is eating", philosopher)
+	eaten := <- phou[philosopher]
+	fmt.Printf("Phil %d has eate %d times", philosopher, eaten)
 }
