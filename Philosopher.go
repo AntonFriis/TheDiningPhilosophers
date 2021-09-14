@@ -57,47 +57,46 @@ func NewPhilosopher(philosopherNumber int, intputChannel, outputChannel chan int
 //Philosopher gorouting function
 //Loops forever, performs commands given via input channel (see top)
 //Anwers via output channel if given question
+
 func PhilosopherStart(philosopher Philosopher) {
 	for {
-		select {
-		//int given from input channel
-		case command := <-philosopher.input:
-			//cases of the command is descriped at the top
-			switch command {
-			case philosopherAskIsEating:
-				//will answer with either is eating or is thinking (see top)
-				philosopher.output <- philosopher.state
-			case philosopherAskTimesEaten:
-				//Answers with the number of times the philosopher has eaten
-				philosopher.output <- philosopher.timesEaten
-			case philosopherSetEating:
-				//Set the philosophers state to eating
-				philosopherAssert(philosopher, command) //checks that the philosopher isnt already eating
-				philosopher.state = philosopherIsEating
-				philosopher.timesEaten++
+		if philosopher.state == philosopherIsThinking {
+			go recuestEating(philosopher)
+		} else if philosopher.state == philosopherAskIsEating {
+			time.Sleep(time.Millisecond * 10)
+			stopEating(philosopher)
+		}
+		command := <-philosopher.input
 
-				time.Sleep(time.Second)
+		//cases of the command is descriped at the top
+		switch command {
+		case philosopherAskIsEating:
+			//will answer with either is eating or is thinking (see top)
+			philosopher.output <- philosopher.state
+		case philosopherAskTimesEaten:
+			//Answers with the number of times the philosopher has eaten
+			philosopher.output <- philosopher.timesEaten
+		case philosopherSetEating:
+			//Set the philosophers state to eating
+			philosopherAssert(philosopher, command) //checks that the philosopher isnt already eating
+			philosopher.state = philosopherIsEating
+			philosopher.timesEaten++
 
-				philosopher.state = philosopherIsThinking
-				philosopher.output <- philosopher.timesEaten
-			case philosopherSetThinking:
-				//Set the philosophers state to thinking and incroments the times he has eaten
-				philosopherAssert(philosopher, command) //checks that the philosopher isnt already thinking
-				philosopher.state = philosopherIsThinking
-			}
-		default:
-			fmt.Println("Phil no orders")
-			if philosopher.state == philosopherIsThinking {
-				recuestEating(philosopher)
-			}
+		case philosopherSetThinking:
+			//Set the philosophers state to thinking and incroments the times he has eaten
+			philosopherAssert(philosopher, command) //checks that the philosopher isnt already thinking
+			philosopher.state = philosopherIsThinking
 		}
 	}
 }
 
 func recuestEating(philosopher Philosopher) {
-	fmt.Println("phil recuesting eat")
 	philosopher.output <- philosopherRecuestEating
-	fmt.Println("phil eat recuested")
+}
+
+func stopEating(philosopher Philosopher) {
+	philosopher.state = philosopherIsThinking
+	philosopher.output <- philosopher.timesEaten
 }
 
 //Checks that philosopher wont change its state (isEating) to something that it is already doing

@@ -2,101 +2,88 @@ package main
 
 import "fmt"
 
-var philIn, philOut, forkIn, forkOut []chan int
-var philoInQue int = -1
+var frin, frou, phin, phou []chan int
 
-func WaiterStartup(runtimes int) {
-	//sets philosopher 0 and 3 to eat
-	beginEating()
-	var i = 0
-	for i < runtimes {
-		if philoInQue != -1 {
-			var other int
-			if philoInQue == 0 {
-				other = 4
-			} else {
-				other = philoInQue - 1
-			}
-			if askFork(philoInQue) && askFork(other) {
-				lockFork(philoInQue)
-				lockFork(other)
-				philIn[philoInQue] <- philosopherSetEating
-				philoInQue = -1
-			}
-		}
+func InitWaiter(forkIn, forkOut, philIn, philOut []chan int) {
+	frin, frou, phin, phou = forkIn, forkOut, philIn, philOut
+}
 
+func status(philosopher, timesEaten int) {
+	fmt.Printf("Phil %d has eaten %d times\n", philosopher, timesEaten)
+}
+
+func surroundingForks(philosopher int) (int, int) {
+	var fork1, fork2 = philosopher - 1, philosopher //Index of the philosophers left (fork1) and right (fork2) fork
+	if fork1 < 0 {                                  //The first philosophers left fork is the last index of the fork array
+		fork1 = 4
+	}
+	return fork1, fork2
+}
+
+func StartWaiter() {
+	fmt.Println("starting")
+
+	for {
 		select {
-		case x := <-philOut[0]:
-			fmt.Println("Philosopher 0 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(0)
-		case x := <-philOut[1]:
-			fmt.Println("Philosopher 1 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(1)
-		case x := <-philOut[2]:
-			fmt.Println("Philosopher 2 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(2)
-		case x := <-philOut[3]:
-			fmt.Println("Philosopher 3 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(3)
-		case x := <-philOut[4]:
-			fmt.Println("Philosopher 4 is thinking")
-			fmt.Printf("He has eaten %d", x)
-			changeEater(4)
+		case philosopherOutput := <-phou[0]:
+			doPhilosopher(0, philosopherOutput)
+		case philosopherOutput := <-phou[1]:
+			doPhilosopher(1, philosopherOutput)
+		case philosopherOutput := <-phou[2]:
+			doPhilosopher(2, philosopherOutput)
+		case philosopherOutput := <-phou[3]:
+			doPhilosopher(3, philosopherOutput)
+		case philosopherOutput := <-phou[4]:
+			doPhilosopher(4, philosopherOutput)
+			//default:
+			//fmt.Println("no input")
+			//continue
 		}
-
-		i++
 	}
-
-}
-func beginEating() {
-	lockFork(0)
-	lockFork(4)
-	philIn[0] <- philosopherSetEating
-
-	lockFork(3)
-	lockFork(2)
-	philIn[3] <- philosopherSetEating
-
 }
 
-func changeEater(curret int) {
-	var other int
-	if curret == 0 {
-		other = 4
-	} else {
-		other = curret - 1
+func doPhilosopher(pNumber, command int) {
+	fmt.Printf("phil %d got command %d", pNumber, command)
+	if command >= 0 {
+		status(pNumber, command)
+		//unlockForks(pNumber)
+	} else if command == philosopherRecuestEating && checkForks(pNumber) {
+		setEat(pNumber)
 	}
-	unlockForks(curret, other)
-	other = curret
-	if curret == 4 {
-		curret = 0
-	} else {
-		curret++
-	}
-	if askFork(curret) && askFork(other) {
-		lockFork(curret)
-		lockFork(other)
-		philIn[curret] <- philosopherSetEating
-
-	} else {
-		philoInQue = curret
-	}
-
 }
 
-func unlockForks(chanl1, chanl2 int) {
-	forkIn[chanl1] <- forkSetFree
-	forkIn[chanl2] <- forkSetFree
+func checkForks(philosopher int) bool {
+	fork1, fork2 := surroundingForks(philosopher)
+	fmt.Printf("Cheking fork %d and %d\n", fork1, fork2)
+	frin[fork1] <- forkAskInUse
+	frin[fork2] <- forkAskInUse
+
+	fork1Status := <-frou[fork1]
+	fork2Status := <-frou[fork2]
+	fmt.Printf("fork %d and %d is ready\n", fork1, fork2)
+	return fork1Status == forkIsFree && fork2Status == forkIsFree
 }
-func askFork(chanl int) bool {
-	forkIn[chanl] <- forkAskInUse
-	answer := <-forkOut[chanl]
-	return answer == -1
+
+func setEat(philosopher int) {
+	fmt.Printf("Phil %d will now eat\n", philosopher)
+
+	//lockForks(philosopher)
+
+	phin[philosopher] <- philosopherSetEating
+	//eaten := <- phou[philosopher]
+
+	//status(philosopher, eaten)
+	fmt.Printf("Phil %d has started eating\n", philosopher)
 }
-func lockFork(chanl int) {
-	forkIn[chanl] <- forkSetUse
+
+func lockForks(philosopher int) {
+	fork1, fork2 := surroundingForks(philosopher)
+	frin[fork1] <- forkSetUse
+	frin[fork2] <- forkSetUse
+}
+
+func unlockForks(philosopher int) {
+	fork1, fork2 := surroundingForks(philosopher)
+	frin[fork1] <- forkSetFree
+	frin[fork2] <- forkSetFree
 }

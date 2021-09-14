@@ -32,14 +32,6 @@ type Fork struct {
 func NewFork(forkNumber int, intputChannel, outputChannel chan int) Fork {
 	var fork = Fork{forkNumber, forkIsFree, 0, intputChannel, outputChannel}
 	return fork
-
-	/*fork := new(Fork)
-	fork.name = forkNumber
-	fork.state = forkIsFree
-	fork.timesUsed = 0
-	fork.input = intputChannel
-	fork.output = outputChannel
-	return fork*/
 }
 
 //Fork gorouting function

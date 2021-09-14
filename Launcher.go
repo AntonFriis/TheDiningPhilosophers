@@ -35,13 +35,7 @@ func main() {
 		go PhilosopherStart(philosophers[p])
 	}
 
-	//INSTANTIATE WAITER AND START WAITER HERE!
+	//Giving waiter all channels and starts it
 	InitWaiter(forkInputChannels, forkOutputChannels, philosopherInputChannels, philosopherOutputChannels)
 	StartWaiter()
-	
-	/*philIn = philosopherInputChannels
-	philOut = philosopherOutputChannels
-	forkIn = forkInputChannels
-	forkOut = forkInputChannels
-	WaiterStartup(5000000)*/
 }
