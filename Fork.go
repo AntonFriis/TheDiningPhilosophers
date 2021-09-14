@@ -17,6 +17,7 @@ var forkAskTimesEaten = 2
 var forkSetFree = 4
 
 type Fork struct {
+
 	state       bool
 	timesUsed   int
 	inputRight  chan int
@@ -25,14 +26,17 @@ type Fork struct {
 	outputLeft  chan int
 }
 
+
 func NewFork(outputChannelRight, intputChannelRight, outputChannelLeft, intputChannelLeft chan int) Fork {
 	var fork = Fork{true, 0, outputChannelRight, intputChannelRight, outputChannelLeft, intputChannelLeft}
+  
 	return fork
 
 }
 
 func ForkStart(fork Fork) {
 	for {
+
 		select {
 		case x := <-fork.inputRight:
 			if x == forkAskInUse {
@@ -61,5 +65,6 @@ func ForkStart(fork Fork) {
 			}
 
 		}
+
 	}
 }

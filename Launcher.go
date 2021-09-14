@@ -1,6 +1,7 @@
 package main
 
 func main() {
+
 	var channels [20]chan int
 	for i := 0; i < 20; i++ {
 		channels[i] = make(chan int)
@@ -18,5 +19,6 @@ func main() {
 		philosophers = append(philosophers, NewPhil(channels[x-1], channels[x], channels[i], channels[i+1]))
 
 	}
+
 
 }
