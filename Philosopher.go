@@ -1,4 +1,4 @@
-package The_dining_philosophers
+package main
 
 import (
 	"fmt"

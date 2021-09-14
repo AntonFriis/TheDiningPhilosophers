@@ -1,13 +1,13 @@
-package The_dining_philosophers
+package main
 
 var philIn, philOut, forkIn, forkOut []chan int
-var philoInQue int
+var philoInQue int = -1
 
 func WaiterStartup(runtimes int) {
 
 	var i = 0
 	for i < runtimes {
-		if philoInQue == -1 {
+		if philoInQue != -1 {
 			var other int
 			if philoInQue == 0 {
 				other = 4
@@ -46,12 +46,7 @@ func unlockForks(chanl1, chanl2 int) {
 func askFork(chanl int) bool {
 	forkIn[chanl] <- forkAskInUse
 	answer := <-forkOut[chanl]
-	if answer == -1 {
-		return true
-	} else {
-		return false
-	}
-
+	return answer == -1
 }
 func lockFork(chanl int) {
 

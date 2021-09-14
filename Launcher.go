@@ -1,9 +1,9 @@
-package The_dining_philosophers
+package main
 
 func main() {
 	//Instantiate 5 Forks and their channels
 	var forkInputChannels = make([]chan int, 5)
-	var forkOutputChannels = make([]chan  int, 5)
+	var forkOutputChannels = make([]chan int, 5)
 	var forks = make([]*Fork, 5)
 	for f := 0; f < 5; f++ {
 		forkInputChannels[f] = make(chan int)
