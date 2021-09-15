@@ -6,22 +6,28 @@ import (
 )
 
 type Philosopher struct {
-	leftIN   chan int
-	leftOUT  chan int
-	rightIN  chan int
-	rightOUT chan int
+	handSide   bool
+	leftIN     chan int
+	leftOUT    chan int
+	rightIN    chan int
+	rightOUT   chan int
+	number     int
+	timesEaten int
 }
 
-func NewPhil(leftIN, leftOUT, rightIN, rightOUT chan int) Philosopher {
-	var phil = Philosopher{leftIN, leftOUT, rightIN, rightOUT}
-	fmt.Println("PHIL IS MADE")
+func NewPhil(number int, handSide bool, leftIN, leftOUT, rightIN, rightOUT chan int) Philosopher {
+	var phil = Philosopher{handSide, leftIN, leftOUT, rightIN, rightOUT, number, 0}
 	return phil
 }
 
 func checkLeft(leftIN, leftOUT chan int) int {
+
 	leftOUT <- forkAskInUse
-	if <-leftIN == forkIsFree {
-		fmt.Println("Left fork is available")
+
+	var x int
+	x = <-leftIN
+
+	if x == forkIsFree {
 		return forkIsFree
 	} else {
 		return forkInUse
@@ -31,44 +37,57 @@ func checkLeft(leftIN, leftOUT chan int) int {
 
 func checkRight(rightIN, rightOUT chan int) int {
 	rightOUT <- forkAskInUse
-	if <-rightIN == forkIsFree {
-		fmt.Println("Right fork is available")
+
+	var x int = <-rightIN
+	if x == forkIsFree {
 		return forkIsFree
 	} else {
-		fmt.Println("Right fork is in use")
 		return forkInUse
 	}
 }
 
 func action(phil Philosopher) {
 	for {
+		if phil.handSide {
+			if checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
 
-		if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree && checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
-			fmt.Println("Philosopher is eating")
-			d := 0.50
-			s := time.Duration(float64(time.Hour.Seconds()*1) * d)
-			time.Sleep(s)
-
-			phil.leftOUT <- forkSetFree
-			phil.rightOUT <- forkSetFree
-		} else if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree && checkRight(phil.rightIN, phil.rightOUT) == forkInUse {
-			phil.leftOUT <- forkIsFree
-			fmt.Println("Philosopher is thinking - right in use")
-			d := 0.33
-			s := time.Duration(float64(time.Hour.Seconds()*1) * d)
-			time.Sleep(s)
-		} else if checkLeft(phil.leftIN, phil.leftOUT) == forkInUse && checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
-			phil.rightOUT <- forkSetFree
-			fmt.Println("Philosopher is thinking - left in use")
-			d := 0.33
-			s := time.Duration(float64(time.Hour.Seconds()*1) * d)
-			time.Sleep(s)
+				if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree {
+					phil.timesEaten++
+					timesEatenByAll[phil.number] = phil.timesEaten
+					fmt.Printf("Philosopher %d has eaten %d*******", phil.number, phil.timesEaten)
+					fmt.Println()
+					s := time.Millisecond * 500
+					time.Sleep(s)
+					phil.rightOUT <- forkSetFree
+					phil.leftOUT <- forkSetFree
+				} else {
+					phil.rightOUT <- forkSetFree
+					fmt.Println("Philosopher is thinking - left not available")
+					s := time.Millisecond * 333
+					time.Sleep(s)
+				}
+			}
 		} else {
-			fmt.Println("Philosopher is thinking both in use")
-			d := 0.33
-			s := time.Duration(float64(time.Hour.Seconds()*1) * d)
-			time.Sleep(s)
+			if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree {
+
+				if checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
+					phil.timesEaten++
+					timesEatenByAll[phil.number] = phil.timesEaten
+					fmt.Printf("Philosopher %d has eaten %d", phil.number, phil.timesEaten)
+					fmt.Println()
+					s := time.Millisecond * 500
+					time.Sleep(s)
+					phil.rightOUT <- forkSetFree
+					phil.leftOUT <- forkSetFree
+				} else {
+					phil.leftOUT <- forkSetFree
+					fmt.Println("Philosopher is thinking - right not available")
+					s := time.Millisecond * 333
+					time.Sleep(s)
+				}
+			}
 		}
+
 	}
 
 }

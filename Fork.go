@@ -27,25 +27,26 @@ type Fork struct {
 	outputLeft  chan int
 }
 
-func NewFork(outputChannelRight, intputChannelRight, outputChannelLeft, intputChannelLeft chan int) Fork {
-	var fork = Fork{true, 0, outputChannelRight, intputChannelRight, outputChannelLeft, intputChannelLeft}
+func NewFork(outputChannelLeft, inputChannelLeft, outputChannelRight, inputChannelRight chan int) Fork {
+	var fork = Fork{true, 0, inputChannelRight, outputChannelRight, inputChannelLeft, outputChannelLeft}
 	fmt.Println("FORK IS MADE")
 	return fork
 
 }
 
 func ForkStart(fork Fork) {
-	fmt.Println("hej")
+
 	for {
 
 		select {
 		case x := <-fork.inputRight:
-			fmt.Println("jeg er Right")
+
 			if x == forkAskInUse {
 
 				if fork.state {
 					fork.state = false
 					fork.outputRight <- forkIsFree
+					fork.timesUsed++
 				} else {
 					fork.outputRight <- forkInUse
 				}
@@ -54,12 +55,13 @@ func ForkStart(fork Fork) {
 			}
 
 		case x := <-fork.inputLeft:
-			fmt.Println("jeg er Left")
+
 			if x == forkAskInUse {
 
 				if fork.state {
 					fork.state = false
 					fork.outputLeft <- forkIsFree
+					fork.timesUsed++
 				} else {
 					fork.outputLeft <- forkInUse
 				}
