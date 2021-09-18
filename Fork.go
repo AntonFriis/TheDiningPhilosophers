@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 /*
 - each fork must include two channels (one for input and one for
   output, both usable from outside) through which it is possible to
@@ -29,7 +27,6 @@ type Fork struct {
 
 func NewFork(outputChannelLeft, inputChannelLeft, outputChannelRight, inputChannelRight chan int) Fork {
 	var fork = Fork{true, 0, inputChannelRight, outputChannelRight, inputChannelLeft, outputChannelLeft}
-	fmt.Println("FORK IS MADE")
 	return fork
 
 }
