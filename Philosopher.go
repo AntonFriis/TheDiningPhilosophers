@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -47,46 +46,30 @@ func checkRight(rightIN, rightOUT chan int) int {
 }
 
 func action(phil Philosopher) {
+	var something bool = true
 	for {
-		if phil.handSide {
-			if checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
+		for something {
+			if phil.handSide && checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
+				something = false
 
-				if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree {
-					phil.timesEaten++
-					timesEatenByAll[phil.number] = phil.timesEaten
-					fmt.Printf("Philosopher %d has eaten %d*******", phil.number, phil.timesEaten)
-					fmt.Println()
-					s := time.Millisecond * 500
-					time.Sleep(s)
-					phil.rightOUT <- forkSetFree
-					phil.leftOUT <- forkSetFree
-				} else {
-					phil.rightOUT <- forkSetFree
-					fmt.Println("Philosopher is thinking - left not available")
-					s := time.Millisecond * 333
-					time.Sleep(s)
-				}
-			}
-		} else {
-			if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree {
-
-				if checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
-					phil.timesEaten++
-					timesEatenByAll[phil.number] = phil.timesEaten
-					fmt.Printf("Philosopher %d has eaten %d", phil.number, phil.timesEaten)
-					fmt.Println()
-					s := time.Millisecond * 500
-					time.Sleep(s)
-					phil.rightOUT <- forkSetFree
-					phil.leftOUT <- forkSetFree
-				} else {
-					phil.leftOUT <- forkSetFree
-					fmt.Println("Philosopher is thinking - right not available")
-					s := time.Millisecond * 333
-					time.Sleep(s)
-				}
+			} else if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree {
+				something = false
 			}
 		}
+		something = true
+		for something {
+			if phil.handSide && checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree {
+				something = false
+
+			} else if checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
+				something = false
+			}
+		}
+		phil.timesEaten++
+		timesEatenByAll[phil.number] = phil.timesEaten
+		phil.rightOUT <- forkSetFree
+		phil.leftOUT <- forkSetFree
+		time.Sleep(time.Millisecond * 2)
 
 	}
 
