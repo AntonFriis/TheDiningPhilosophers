@@ -46,6 +46,7 @@ func checkRight(rightIN, rightOUT chan int) int {
 }
 
 func action(phil Philosopher) {
+
 	var gotFork bool = true
 	for {
 		for gotFork {
@@ -63,6 +64,7 @@ func action(phil Philosopher) {
 
 			} else if checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
 				gotFork = false
+
 			}
 		}
 		phil.timesEaten++
