@@ -46,23 +46,25 @@ func checkRight(rightIN, rightOUT chan int) int {
 }
 
 func action(phil Philosopher) {
-	var getFork bool = true
+
+	var gotFork bool = true
 	for {
-		for getFork {
+		for gotFork {
 			if phil.handSide && checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
-				getFork = false
+				gotFork = false
 
 			} else if checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree {
-				getFork = false
+				gotFork = false
 			}
 		}
-		getFork = true
-		for getFork {
+		gotFork = true
+		for gotFork {
 			if phil.handSide && checkLeft(phil.leftIN, phil.leftOUT) == forkIsFree {
-				getFork = false
+				gotFork = false
 
 			} else if checkRight(phil.rightIN, phil.rightOUT) == forkIsFree {
-				getFork = false
+				gotFork = false
+
 			}
 		}
 		phil.timesEaten++
