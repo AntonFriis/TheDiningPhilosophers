@@ -1,8 +1,6 @@
 package main
 
-import (
-	"time"
-)
+import "time"
 
 type Philosopher struct {
 	handSide   bool
@@ -71,7 +69,7 @@ func action(phil Philosopher) {
 		timesEatenByAll[phil.number] = phil.timesEaten
 		phil.rightOUT <- forkSetFree
 		phil.leftOUT <- forkSetFree
-		time.Sleep(time.Millisecond * 2)
+		time.Sleep(time.Nanosecond)
 
 	}
 

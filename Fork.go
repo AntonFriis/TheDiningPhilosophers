@@ -17,6 +17,7 @@ var forkAskTimesEaten = 2
 var forkSetFree = 4
 
 type Fork struct {
+	number      int
 	state       bool
 	timesUsed   int
 	inputRight  chan int
@@ -25,8 +26,8 @@ type Fork struct {
 	outputLeft  chan int
 }
 
-func NewFork(outputChannelLeft, inputChannelLeft, outputChannelRight, inputChannelRight chan int) Fork {
-	var fork = Fork{true, 0, inputChannelRight, outputChannelRight, inputChannelLeft, outputChannelLeft}
+func NewFork(counter int, outputChannelLeft, inputChannelLeft, outputChannelRight, inputChannelRight chan int) Fork {
+	var fork = Fork{counter, true, 0, inputChannelRight, outputChannelRight, inputChannelLeft, outputChannelLeft}
 	return fork
 
 }
@@ -43,11 +44,12 @@ func ForkStart(fork Fork) {
 				if fork.state {
 					fork.state = false
 					fork.outputRight <- forkIsFree
-					fork.timesUsed++
 				} else {
 					fork.outputRight <- forkInUse
 				}
 			} else {
+				fork.timesUsed++
+				timesUsed[fork.number] = fork.timesUsed
 				fork.state = true
 			}
 
@@ -58,11 +60,13 @@ func ForkStart(fork Fork) {
 				if fork.state {
 					fork.state = false
 					fork.outputLeft <- forkIsFree
-					fork.timesUsed++
+
 				} else {
 					fork.outputLeft <- forkInUse
 				}
 			} else {
+				fork.timesUsed++
+				timesUsed[fork.number] = fork.timesUsed
 				fork.state = true
 			}
 
